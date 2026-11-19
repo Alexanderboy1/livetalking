@@ -268,5 +268,7 @@ def setup_routes(app):
 
     # 注册 avatar 生成相关的路由
     setup_avatar_routes(app)
+    from server.classroom.routes import setup_classroom_routes
+    setup_classroom_routes(app)
 
     app.router.add_static('/', path='web')

@@ -220,8 +220,11 @@ class BaseAvatar:
         self.msgqueues.append(msgqueue)
 
     def send_msg(self, msg):
-        for q in self.msgqueues:
-            q.put(msg)
+        for q in tuple(self.msgqueues):
+            try:
+                q.put_nowait(msg)
+            except queue.Full:
+                logger.warning('Dropping event for slow consumer')
 
     def notify(self, eventpoint:dict):
         if eventpoint and eventpoint.get('status'):

@@ -17,11 +17,14 @@ class EdgeTTS(BaseTTS):
         voice = self.opt.REF_FILE or "zh-CN-YunxiaNeural" 
         voicename = textevent.get('tts', {}).get('ref_file',voice) #self.opt.REF_FILE #"zh-CN-YunxiaNeural"
         t = time.time()
-        asyncio.new_event_loop().run_until_complete(self.__main(voicename,text))
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(self.__main(voicename,text))
+        finally:
+            loop.close()
         logger.info(f'-------edge tts time:{time.time()-t:.4f}s')
         if self.input_stream.getbuffer().nbytes<=0: #edgetts err
-            logger.error('edgetts err!!!!!')
-            return
+            raise RuntimeError('Edge TTS returned no audio')
         
         self.input_stream.seek(0)
         stream = self.__create_bytes_stream(self.input_stream)
@@ -32,7 +35,7 @@ class EdgeTTS(BaseTTS):
             streamlen -= self.chunk
             if idx==0:
                 eventpoint={'status':'start','text':text}
-            elif streamlen<self.chunk:
+            if streamlen<self.chunk:
                 eventpoint={'status':'end','text':text}
             eventpoint.update(**textevent) #eventpoint={'status':'end','text':text,'msgevent':textevent}
             self.parent.put_audio_frame(stream[idx:idx+self.chunk],eventpoint)

@@ -28,7 +28,8 @@ class BaseTTS:
         self.state = State.RUNNING
 
     def flush_talk(self):
-        self.msgqueue.queue.clear()
+        with self.msgqueue.mutex:
+            self.msgqueue.queue.clear()
         self.state = State.PAUSE
 
     def put_msg_txt(self, msg: str, datainfo: dict = {}): 
@@ -46,7 +47,12 @@ class BaseTTS:
                 self.state = State.RUNNING
             except queue.Empty:
                 continue
-            self.txt_to_audio(msg)
+            try:
+                self.txt_to_audio(msg)
+            except Exception:
+                logger.exception('TTS synthesis failed')
+                if msg[1].get('classroom_utterance'):
+                    self.parent.notify(dict(msg[1], status='classroom_error'))
         self.stop_tts()
         logger.info('ttsreal thread stop')
     

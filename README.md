@@ -138,6 +138,8 @@ python app.py --transport webrtc --model wav2lip --avatar_id wav2lip256_avatar1
 
 <img src="./assets/index.jpg" align="middle"/>
 
+数字人直播授课控制台：`/classroom`。部署、依赖及使用流程见 [数字人课堂部署说明](docs/classroom_deploy.md)。
+
 ### 2.5 快速体验
 
 1. 使用在线镜像创建实例即可运行:

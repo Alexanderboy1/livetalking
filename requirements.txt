@@ -43,6 +43,9 @@ accelerate
 
 librosa
 openai
+# Classroom: PDF rendering and PPTX speaker notes (LibreOffice is a system dependency)
+PyMuPDF>=1.24,<2
+python-pptx>=1.0,<2
 #websocket-client
 websockets==12.0
 dashscope
